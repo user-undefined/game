@@ -1,13 +1,15 @@
-import React from 'react';
-import Game from './components/game/game.component';
+import React, { } from 'react';
+import { Router } from "@reach/router";
+
+import GameScreen from './screens/game-screen/game-screen.component';
 
 function App() {
-  const role = "user";
+  const role = "master";
 
   return (
-    <div>
-      <Game role={role} />
-    </div>
+    <Router>
+      <GameScreen path="game/*" />
+    </Router>
   );
 }
 

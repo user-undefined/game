@@ -1,21 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Paper from "@material-ui/core/Paper";
-import Card from "@material-ui/core/Card";
-import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 
-import BombCell from "./event-cell/bomb-cell.component";
-import OwnerCell from "./event-cell/owned-cell.component";
-import NooneCell from "./event-cell/noone-cell.component";
+import NeutralCell from "./neutral-cell/neutral-cell.component";
+import EventCell from "./event-cell/event-cell.component";
 
-import { isMaster } from "./board-cell.roles";
+import { useOpenGameCard } from "../game.hooks";
+import { GameScreenContext } from "../../../screens/game-screen/game-screen.context";
 
-const cellTypeMapping = {
-  bomb: BombCell,
-  owned: OwnerCell,
-  noones: NooneCell
-};
+import { isMaster, isUser } from "./board-cell.roles";
 
 const useStyles = makeStyles({
   gameCell: {
@@ -34,7 +26,7 @@ export const useCellStyles = makeStyles(theme => ({
     height: "300px"
   },
   containerBorder: {
-    border: props => (isMaster(props.role) ? "none" : "2px solid black")
+    border: "2px solid black"
   },
   containerBg: {
     backgroundColor: "#FFF5C3"
@@ -74,32 +66,60 @@ export const useCellStyles = makeStyles(theme => ({
 }));
 
 /*eslint-disable */
-export const BoardCell = ({ cell, position, role }) => {
+export const BoardCell = ({ cell, position, role, id, masterKey }) => {
   const classes = useStyles();
+  // const {
+  //   gameCredentials: { id, masterKey }
+  // } = useContext(GameScreenContext);
+  console.log("BoardCell::", id, masterKey);
+  if (id && masterKey) {
+    const { data, openCard } = useOpenGameCard(id, masterKey);
 
-  const EventCell = cellTypeMapping[cell.type];
-  const onCheck = (cardNumber, cardValue) => {
-    if(confirm(`${cardNumber}. ${cardValue}`)) {
-      acceptAnswer(cardNumber)
-    }
-  };
+    const onCorrectAnswer = (cardNumber, cardValue) => {
+      if (confirm(`${cardNumber}. ${cardValue}`)) {
+        openCard(cardNumber);
+      }
+    };
 
-  return (
-    <>
-      <div className={classes.gameCell}>
-        {EventCell && (
+    const onIncorrectAnswer = (cardNumber, cardValue) => {
+      if (confirm(`${cardNumber}. ${cardValue}`)) {
+        openCard(cardNumber);
+      }
+    };
+
+    if (isMaster(role)) {
+      return (
+        <div className={classes.gameCell}>
           <EventCell
+            type={cell.type}
             value={cell.value}
             role={role}
             position={position}
             owner={cell.owner}
             ordinal={cell.ordinal}
-            onCheck={onCheck}
+            onSuccess={onCorrectAnswer}
+            onError={onIncorrectAnswer}
           />
-        )}
-      </div>
-    </>
-  );
+        </div>
+      );
+    }
+
+    if (isUser(role)) {
+      return (
+        <div className={classes.gameCell}>
+          <NeutralCell
+            value={cell.value}
+            role={role}
+            position={position}
+            owner={cell.owner}
+            ordinal={cell.ordinal}
+          />
+        </div>
+      );
+    }
+  }
+
+  return null;
 };
 
 export default BoardCell;

@@ -24,16 +24,16 @@ const useStyles = makeStyles(theme => ({
 
 export const OwnedCell = ({
   value,
-  role,
-  ordinal,
+  ordinal: cellNumber,
   position,
   owner,
-  onCheck
+  onSuccess,
+  onError
 }) => {
-  const generalClasses = useCellStyles({ role });
+  const generalClasses = useCellStyles();
   const classes = useStyles();
 
-  return isMaster(role) ? (
+  return (
     <Card className={clsx(generalClasses.container, classes[owner])}>
       <div className={generalClasses.details}>
         <CardContent className={generalClasses.content}>
@@ -50,38 +50,16 @@ export const OwnedCell = ({
           </Typography>
           <div className={generalClasses.controls}>
             <IconButton aria-label="play/pause">
-              <CheckIcon className={generalClasses.icon} />
+              <CheckIcon
+                className={generalClasses.icon}
+                onClick={() => onSuccess(cellNumber, value)}
+              />
             </IconButton>
             <IconButton aria-label="close">
-              <CloseIcon className={generalClasses.icon} />
-            </IconButton>
-          </div>
-        </CardContent>
-      </div>
-    </Card>
-  ) : (
-    <Card
-      className={clsx(generalClasses.container, generalClasses.containerBorder)}
-    >
-      <div className={generalClasses.details}>
-        <CardContent className={generalClasses.content}>
-          <Typography
-            component="h3"
-            variant="h3"
-            title={value}
-            classes={{ root: generalClasses.value }}
-          >
-            {value}
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            {value}
-          </Typography>
-          <div className={generalClasses.controls}>
-            <IconButton
-              aria-label="play/pause"
-              onClick={() => onCheck(ordinal, value)}
-            >
-              <CheckIcon className={generalClasses.icon} />
+              <CloseIcon
+                className={generalClasses.icon}
+                onClick={() => onError(cellNumber, value)}
+              />
             </IconButton>
           </div>
         </CardContent>

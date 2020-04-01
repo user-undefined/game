@@ -10,11 +10,9 @@ import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 
 import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from '@material-ui/icons/Close';
+import CloseIcon from "@material-ui/icons/Close";
 
 import { useCellStyles } from "../board-cell.component";
-
-import { isMaster } from "../board-cell.roles";
 
 const useStyles = makeStyles(theme => ({
   containerBg: {
@@ -22,11 +20,17 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const BombCell = ({ value, role, ordinal, position, onCheck }) => {
+export const BombCell = ({
+  value,
+  ordinal: cellNumber,
+  position,
+  onSuccess,
+  onError
+}) => {
   const generalClasses = useCellStyles();
   const classes = useStyles();
 
-  return isMaster(role) ? (
+  return (
     <Card className={clsx(generalClasses.container, classes.containerBg)}>
       <div className={generalClasses.details}>
         <CardContent className={generalClasses.content}>
@@ -42,10 +46,16 @@ export const BombCell = ({ value, role, ordinal, position, onCheck }) => {
           </Typography>
           <div className={generalClasses.controls}>
             <IconButton aria-label="play/pause">
-              <CheckIcon className={generalClasses.icon} />
+              <CheckIcon
+                className={generalClasses.icon}
+                onClick={() => onSuccess(cellNumber, value)}
+              />
             </IconButton>
             <IconButton aria-label="close">
-              <CloseIcon className={generalClasses.icon} />
+              <CloseIcon
+                className={generalClasses.icon}
+                onClick={() => onError(cellNumber, value)}
+              />
             </IconButton>
           </div>
         </CardContent>
@@ -56,30 +66,6 @@ export const BombCell = ({ value, role, ordinal, position, onCheck }) => {
         component="img"
         title="bomb"
       />
-    </Card>
-  ) : (
-    <Card
-      className={clsx(generalClasses.container, generalClasses.containerBorder)}
-    >
-      <div className={generalClasses.details}>
-        <CardContent className={generalClasses.content}>
-          <Typography
-            component="h3"
-            variant="h3"
-            classes={{ root: generalClasses.value }}
-          >
-            {value}
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            {value}
-          </Typography>
-          <div className={generalClasses.controls}>
-            <IconButton aria-label="play/pause" onClick={onCheck}>
-              <CheckIcon className={generalClasses.icon} />
-            </IconButton>
-          </div>
-        </CardContent>
-      </div>
     </Card>
   );
 };

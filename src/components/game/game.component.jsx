@@ -1,7 +1,8 @@
 import React from "react";
-import { gameDataUserHook, gameDataMasterHook } from "./game.hooks";
+import { getMasterGameData, getUserGameData } from "./game.hooks";
 import { makeStyles } from "@material-ui/core/styles";
 import Board from "./board/board.component";
+import { isMaster, isUser } from "./game.roles";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -11,33 +12,45 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Game = ({ role }) => {
+const Game = ({ id, role, path, masterKey }) => {
   const classes = useStyles();
-  const gameData = gameDataMasterHook();
-  let { board } = gameData;
-  if (board) {
-    board = {
-      state: [
-        ...board.state.map(state => {
-          return [...state, ...state];
-        }),
-        ...board.state.map(state => {
-          const newState = state.map(cell => ({
-            ...cell,
-            value: "Wielmi dluga wartosc"
-          }));
-          return [...newState, ...newState];
-        }),
-        ...board.state.map(state => {
-          return [...state, ...state];
-        })
-      ]
-    };
+  let gameData;
+  let board;
+
+  console.log("Game", id, role, path, masterKey);
+
+  if (id && isUser(role)) {
+    gameData = getUserGameData(id);
+    board = gameData.board;
   }
-  console.log(board);
-  return board ? (
+
+  if (id && isMaster(role)) {
+    gameData = getMasterGameData(id, masterKey);
+    board = gameData.board;
+  }
+  // if (board) {
+  //   board = {
+  //     state: [
+  //       ...board.state.map(state => {
+  //         return [...state, ...state];
+  //       }),
+  //       ...board.state.map(state => {
+  //         const newState = state.map(cell => ({
+  //           ...cell,
+  //           value: "Wielmi dluga wartosc"
+  //         }));
+  //         return [...newState, ...newState];
+  //       }),
+  //       ...board.state.map(state => {
+  //         return [...state, ...state];
+  //       })
+  //     ]
+  //   };
+  // }
+
+  return id && board ? (
     <div className={classes.layout}>
-      <Board board={board} role={role} />
+      <Board board={board} role={role} id={id} masterKey={masterKey} />
     </div>
   ) : (
     <div>Loading</div>

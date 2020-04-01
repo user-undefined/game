@@ -1,13 +1,13 @@
 /*eslint-disable */
 import { useEffect, useState } from "react";
-import { fetchGameDataMaster, fetchGameDataUser, fetchGameDataRoles } from "../../services/game.service";
+import gameService from "../../services/game.service";
 
-export const gameDataUserHook = () => {
+export const getUserGameData = (id) => {
     const [data, setData] = useState({});
     useEffect(() => {
         async function getData() {
             try {
-                const data = await fetchGameDataUser().then(response => response.data);
+                const data = await gameService.fetchGameDataUser(id).then(response => response.data);
                 setData(data);
 
             } catch (err) {
@@ -20,12 +20,12 @@ export const gameDataUserHook = () => {
     return data;
 }
 
-export const gameDataMasterHook = () => {
+export const getMasterGameData = (id, masterKey) => {
     const [data, setData] = useState({});
     useEffect(() => {
         async function getData() {
             try {
-                const data = await fetchGameDataMaster().then(response => response.data);
+                const data = await gameService.fetchGameDataMaster(id, masterKey).then(response => response.data);
                 setData(data);
 
             } catch (err) {
@@ -38,13 +38,13 @@ export const gameDataMasterHook = () => {
     return data;
 }
 
-export const gameDataRoleHook = () => {
+export const startGame = () => {
     const [data, setData] = useState({});
 
     useEffect(() => {
         async function getData() {
             try {
-                const data = await fetchGameDataRoles().then(response => response.data);
+                const data = await gameService.startGame().then(response => response.data);
                 setData(data);
 
             } catch (err) {
@@ -55,4 +55,26 @@ export const gameDataRoleHook = () => {
     }, []);
 
     return data;
+}
+
+export const useOpenGameCard = (id, masterKey) => {
+    const [openedCardNumber, openCard] = useState(-1);
+    const [data, setData] = useState({});
+
+    useEffect(() => {
+        async function getData(cardNumber) {
+            try {
+                const data = await gameService.openGameCard(id, cardNumber, masterKey).then(response => response.data);
+                setData(data);
+
+            } catch (err) {
+                alert(err);
+            }
+        }
+        if (openedCardNumber !== -1) {
+            getData(openedCardNumber);
+        }
+    }, [openedCardNumber]);
+
+    return { data, openCard };
 }

@@ -13,10 +13,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const Board = ({ board, role }) => {
+export const Board = ({ board, role, id, masterKey }) => {
   const classes = useStyles();
 
-  console.log(role);
   return (
     <Grid container>
       {board &&
@@ -37,6 +36,8 @@ export const Board = ({ board, role }) => {
                       cell={gameCell}
                       position={position}
                       role={role}
+                      id={id}
+                      masterKey={masterKey}
                     />
                   </Grid>
                 );

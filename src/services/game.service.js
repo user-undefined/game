@@ -1,22 +1,37 @@
 import instance from './instance';
 
-export function fetchGameDataMaster() {
+function fetchGameDataMaster(id, masterKey) {
+    console.log('fetchGameDataMaster', `/game${id}/master?key=${masterKey}`)
     return instance({
         method: 'get',
-        url: '/game/4234324/master?key=dfsdfsdfsdfsdf',
+        url: `/game/${id}/master?key=${masterKey}`,
     });
 }
 
-export function fetchGameDataUser() {
+function fetchGameDataUser(id) {
     return instance({
         method: 'get',
-        url: '/game/4234324',
+        url: `/game/${id}`,
     });
 }
 
-export function fetchGameDataRoles() {
+function openGameCard(id, cardNumber, masterKey) {
+    return instance({
+        method: 'put',
+        url: `/game/${id}/master/open/${cardNumber}?key=${masterKey}`
+    })
+}
+
+function createGame() {
     return instance({
         method: 'post',
         url: '/game',
     });
+}
+
+export default {
+    createGame,
+    fetchGameDataUser,
+    fetchGameDataMaster,
+    openGameCard
 }
