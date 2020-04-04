@@ -1,17 +1,17 @@
 import instance from './instance';
 
-function fetchGameDataMaster(id, masterKey) {
-    console.log('fetchGameDataMaster', `/game${id}/master?key=${masterKey}`)
+function fetchGameDataMaster(id, masterKey, versionId) {
+    console.log('fetchGameDataMaster', `/game${id}/master?key=${masterKey}&versionId=${versionId}`)
     return instance({
         method: 'get',
         url: `/game/${id}/master?key=${masterKey}`,
     });
 }
 
-function fetchGameDataUser(id) {
+function fetchGameDataUser(id, versionId) {
     return instance({
         method: 'get',
-        url: `/game/${id}`,
+        url: `/game/${id}?versionId=${versionId}`,
     });
 }
 
@@ -22,15 +22,7 @@ function openGameCard(id, cardNumber, masterKey) {
     })
 }
 
-function createGame() {
-    return instance({
-        method: 'post',
-        url: '/game',
-    });
-}
-
 export default {
-    createGame,
     fetchGameDataUser,
     fetchGameDataMaster,
     openGameCard

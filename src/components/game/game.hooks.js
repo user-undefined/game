@@ -1,80 +1,96 @@
 /*eslint-disable */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+
 import gameService from "../../services/game.service";
+import notificationService from "../../services/notification.service";
+import { CredentialsContext } from "../../facilities/authentication/credentials.context";
+import { isUser, isMaster } from "../../facilities/authorization/authorization.utils";
 
-export const getUserGameData = (id) => {
-    const [data, setData] = useState({});
+export const useGameData = (role) => {
+    const [gameVersion, setGameVersion] = useState(0);
+    const [gameData, setGameData] = useState({});
+
+    const { credentials } = useContext(CredentialsContext);
+
     useEffect(() => {
-        async function getData() {
-            try {
-                const data = await gameService.fetchGameDataUser(id).then(response => response.data);
-                setData(data);
+        if (isUser(role)) {
+            const { id } = credentials;
+            async function getUserGameData() {
+                try {
+                    const { data } = await gameService.fetchGameDataUser(id, gameVersion);
+                    setGameData(data);
 
-            } catch (err) {
-                alert(err);
+                } catch (err) {
+                    alert(err);
+                }
             }
-        }
-        getData();
-    }, []);
+            getUserGameData();
+        } else if (isMaster(role)) {
+            const { id, secretKey } = credentials;
+            async function getMaterGameData() {
+                try {
+                    const { data } = await gameService.fetchGameDataMaster(id, secretKey, gameVersion);
+                    setGameData(data);
 
-    return data;
+                } catch (err) {
+                    alert(err);
+                }
+            }
+            getMaterGameData();
+        }
+    }, [gameVersion]);
+
+    const getGameData = (version) => {
+        setGameVersion(version);
+    }
+
+    return { gameData, getGameData };
 }
 
-export const getMasterGameData = (id, masterKey) => {
-    const [data, setData] = useState({});
-    useEffect(() => {
-        async function getData() {
-            try {
-                const data = await gameService.fetchGameDataMaster(id, masterKey).then(response => response.data);
-                setData(data);
+export const useGameCard = () => {
+    const { credentials } = useContext(CredentialsContext);
+    const { id, secretKey } = credentials;
+    const [cardNumberToOpen, openCard] = useState(-1);
 
+    const openCardWrapper = (number) => {
+        console.log("open wrapper", number);
+        openCard(number);
+    };
+
+    useEffect(() => {
+        function getData(cardNumber) {
+            try {
+                gameService.openGameCard(id, cardNumber, secretKey).then(response => response.status);
             } catch (err) {
                 alert(err);
             }
         }
-        getData();
-    }, []);
+        if (cardNumberToOpen !== -1) {
+            getData(cardNumberToOpen);
+        }
+    }, [cardNumberToOpen]);
 
-    return data;
+    return { openCard: openCardWrapper };
 }
 
-export const startGame = () => {
-    const [data, setData] = useState({});
-
+export const useGameNotifications = (id) => {
+    const [gameVersion, setGameVersion] = useState(0);
     useEffect(() => {
-        async function getData() {
-            try {
-                const data = await gameService.startGame().then(response => response.data);
-                setData(data);
-
-            } catch (err) {
-                alert(err);
-            }
-        }
-        getData();
+        const connection = notificationService.getGameNotifications(id);
+        connection.onopen = () => { console.log("Notification connection is opened"); };
+        connection.onmessage = (message) => {
+            const { data } = message;
+            const { gameVersionId } = JSON.parse(data);
+            setGameVersion(gameVersionId);
+        };
+        connection.onclose = () => {
+            connection.close();
+        };
+        // TODO: close websocket
+        // return () => {
+        //     console.log("Notification connection is closed"); 
+        //     connection.close();
+        // };
     }, []);
-
-    return data;
-}
-
-export const useOpenGameCard = (id, masterKey) => {
-    const [openedCardNumber, openCard] = useState(-1);
-    const [data, setData] = useState({});
-
-    useEffect(() => {
-        async function getData(cardNumber) {
-            try {
-                const data = await gameService.openGameCard(id, cardNumber, masterKey).then(response => response.data);
-                setData(data);
-
-            } catch (err) {
-                alert(err);
-            }
-        }
-        if (openedCardNumber !== -1) {
-            getData(openedCardNumber);
-        }
-    }, [openedCardNumber]);
-
-    return { data, openCard };
+    return { gameVersion }
 }

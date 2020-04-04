@@ -1,17 +1,19 @@
-import React, { useContext } from "react";
-import { Router } from "@reach/router";
-import { GameScreenContext } from "../game-screen.context";
-import Game from "../../../components/game/game.component";
+import React, { useEffect } from "react";
 
-const OngoingGameScreen = ({ path, gameId }) => {
-  const { gameCredentials } = useContext(GameScreenContext);
-  console.log("OngoingGameScreen", path, gameId);
-  return (
-    <Router>
-      <Game path="/" id={gameId} role="user" />
-      <Game path="/master/:masterKey" id={gameId} role="master" />
-    </Router>
-  );
+import { useAuthentication } from "../../../facilities/authentication/authentication.hooks";
+import { useAuthorization } from "../../../facilities/authorization/authorization.hooks";
+
+import Game from "../../../components/game";
+
+const OngoingGameScreen = ({ id, secretKey }) => {
+  const { authenticate, isAuthenticated } = useAuthentication();
+  const { role } = useAuthorization();
+
+  useEffect(() => {
+    authenticate({ id, secretKey });
+  }, []);
+
+  return isAuthenticated() ? <Game role={role} /> : null;
 };
 
 export default OngoingGameScreen;

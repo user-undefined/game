@@ -1,7 +1,9 @@
 import React from "react";
+
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import BoardCell from "../board-cell/board-cell.component";
+
+import Cell from "../cell";
 
 const useStyles = makeStyles(theme => ({
   board: {
@@ -13,32 +15,23 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-export const Board = ({ board, role, id, masterKey }) => {
+export const Board = ({ state, role }) => {
   const classes = useStyles();
 
   return (
     <Grid container>
-      {board &&
-        board.state &&
-        board.state.map((gameRow, index) => {
-          const columnIndex = index;
+      {state &&
+        state.map((boardRow, rowIndex) => {
           return (
-            <Grid direction="column">
-              {gameRow.map((gameCell, index) => {
-                const rowIndex = index;
-                const position = {
-                  rowIndex,
-                  columnIndex
-                };
+            <Grid key={`board-row-${rowIndex}`}>
+              {boardRow.map((cell, columnIndex) => {
                 return (
-                  <Grid item className={classes.boardCell}>
-                    <BoardCell
-                      cell={gameCell}
-                      position={position}
-                      role={role}
-                      id={id}
-                      masterKey={masterKey}
-                    />
+                  <Grid
+                    item
+                    key={`board-cell-${rowIndex}-${columnIndex}`}
+                    className={classes.boardCell}
+                  >
+                    <Cell role={role} {...cell} />
                   </Grid>
                 );
               })}
