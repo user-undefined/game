@@ -6,7 +6,7 @@ import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 
-import { getCellColor } from "./cell.utils";
+import { getCellBackground, getTextColor } from "./cell.utils";
 
 export const useStyles = makeStyles(theme => ({
   container: {
@@ -14,7 +14,7 @@ export const useStyles = makeStyles(theme => ({
     display: "flex",
     alignItems: "center",
     width: "300px",
-    height: "300px",
+    height: "150px",
     cursor: "pointer",
     "&$containerOpened": {
       cursor: "not-allowed"
@@ -26,9 +26,11 @@ export const useStyles = makeStyles(theme => ({
   containerOpened: {
     opacity: 0.45
   },
-  containerBg: ({ background }) => ({
+  containerBackground: ({ background }) => ({
     background,
-    backgroundSize: "cover"
+    backgroundSize: "contain",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center"
   }),
   details: {
     display: "flex",
@@ -42,12 +44,14 @@ export const useStyles = makeStyles(theme => ({
     display: "flex",
     flexDirection: "column"
   },
-  value: {
+  value: ({ textColor }) => ({
     width: "100%",
     wordWrap: "break-word",
     textAlign: "center",
-    hyphens: "manual"
-  },
+    hyphens: "manual",
+    color: textColor
+
+  }),
   cover: {
     width: 151,
     margin: theme.spacing(1)
@@ -59,15 +63,17 @@ export const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(1),
     paddingBottom: theme.spacing(1)
   },
-  icon: {
+  icon: ({ textColor }) => ({
     height: 38,
-    width: 38
-  }
+    width: 38,
+    color: textColor
+  })
 }));
 
 export const Cell = ({ value, opened, owner, type, options = {} }) => {
-  const background = getCellColor({ owner, type });
-  const classes = useStyles({ background });
+  const background = getCellBackground({ owner, type });
+  const textColor = getTextColor({ owner, type });
+  const classes = useStyles({ background, textColor });
 
   const { controls } = options;
 
@@ -77,7 +83,7 @@ export const Cell = ({ value, opened, owner, type, options = {} }) => {
       className={clsx(
         classes.container,
         classes.containerBorder,
-        classes.containerBg,
+        classes.containerBackground,
         opened && classes.containerOpened
       )}
     >
@@ -93,7 +99,9 @@ export const Cell = ({ value, opened, owner, type, options = {} }) => {
         </CardContent>
         {!opened && controls && (
           <div className={classes.controls}>
-            {controls.map(({ renderControl }) => renderControl({ classes: { icon: classes.icon}}))}
+            {controls.map(({ renderControl }) =>
+              renderControl({ classes: { icon: classes.icon } })
+            )}
           </div>
         )}
       </div>

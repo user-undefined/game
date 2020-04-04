@@ -6,10 +6,6 @@ import Grid from "@material-ui/core/Grid";
 import Cell from "../cell";
 
 const useStyles = makeStyles(theme => ({
-  board: {
-    width: "100px",
-    height: "100px"
-  },
   boardCell: {
     margin: theme.spacing(1)
   }

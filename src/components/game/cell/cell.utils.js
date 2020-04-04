@@ -6,13 +6,11 @@ import { colors } from "./cell.colors";
 
 import { isUser, isMaster } from "../../../facilities/authorization/authorization.utils";
 
-
-
 export const isOpened = (state) => {
   return state === CELL_STATE.OPENED;
 }
 
-export const getCellColor = ({ type, owner }) => {
+export const getCellBackground = ({ type, owner }) => {
   switch (type) {
     case CELL_TYPES.OWNED:
       switch (owner) {
@@ -25,6 +23,16 @@ export const getCellColor = ({ type, owner }) => {
     default: return "none";
   }
 }
+
+export const getTextColor = ({ type, owner }) => {
+  switch (type) {
+    case CELL_TYPES.OWNED: return colors.textDark;
+    case CELL_TYPES.NOONES: return colors.textDark;
+    case CELL_TYPES.BOMB: return colors.textLight;
+    default: return "none";
+  }
+}
+
 
 export const getCellComponent = role => {
   if (isUser(role)) return UserCell;
