@@ -19,7 +19,6 @@ const GameScreen = ({ path }) => {
     <div className={classes.container}>
       <Authentication>
         <Router>
-          <CreateGameScreen path="create" />
           <OngoingGameScreen path=":id/master/:secretKey" />
           <OngoingGameScreen path=":id" />
         </Router>
