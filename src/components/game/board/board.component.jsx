@@ -6,7 +6,8 @@ import Cell from "../cell";
 import { useCellDimensions } from "./board.hooks";
 import { BOARD_GRID } from "./board.constants";
 
-export const Board = ({ state, size, role, width }) => {
+export const Board = ({ board, role, width }) => {
+  const { state, size } = board;
   const flatState = state.flatMap((array) => array);
   const { height } = useCellDimensions(flatState.length, width);
   return (
