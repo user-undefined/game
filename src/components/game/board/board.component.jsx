@@ -1,41 +1,29 @@
 import React from "react";
 
-import { makeStyles } from "@material-ui/core/styles";
+import withWidth from "@material-ui/core/withWidth";
 import Grid from "@material-ui/core/Grid";
-
 import Cell from "../cell";
+import { useCellDimensions } from "./board.hooks";
+import { BOARD_GRID } from "./board.constants";
 
-const useStyles = makeStyles(theme => ({
-  boardCell: {
-    margin: theme.spacing(1)
-  }
-}));
-
-export const Board = ({ state, role }) => {
-  const classes = useStyles();
-
+export const Board = ({ state, size, role, width }) => {
+  const flatState = state.flatMap((array) => array);
+  const { height } = useCellDimensions(flatState.length, width);
   return (
-    <Grid container>
-      {state &&
-        state.map((boardRow, rowIndex) => {
-          return (
-            <Grid key={`board-row-${rowIndex}`}>
-              {boardRow.map((cell, columnIndex) => {
-                return (
-                  <Grid
-                    item
-                    key={`board-cell-${rowIndex}-${columnIndex}`}
-                    className={classes.boardCell}
-                  >
-                    <Cell role={role} {...cell} />
-                  </Grid>
-                );
-              })}
-            </Grid>
-          );
-        })}
+    <Grid container spacing={1}>
+      {flatState.map((cell, index) => (
+        <Grid
+          item
+          xs={BOARD_GRID.xs}
+          sm={BOARD_GRID.sm}
+          md={BOARD_GRID.md}
+          key={`board-cell-${index}`}
+        >
+          <Cell role={role} height={height} {...cell} />
+        </Grid>
+      ))}
     </Grid>
   );
 };
 
-export default Board;
+export default withWidth()(Board);

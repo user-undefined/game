@@ -17,7 +17,7 @@ import Cell from "../cell.component";
 
 import { useGameCard } from "../../game.hooks";
 
-const MasterCell = ({ value, type, state, owner, ordinal }) => {
+const MasterCell = ({ height, width, value, type, state, owner, ordinal }) => {
   const { openCard } = useGameCard();
   const [open, setOpen] = React.useState(false);
 
@@ -33,15 +33,16 @@ const MasterCell = ({ value, type, state, owner, ordinal }) => {
           <IconButton aria-label="choice" onClick={handleOpen}>
             <CheckIcon className={classes.icon} />
           </IconButton>
-        )
-      }
-    ]
+        ),
+      },
+    ],
   };
-
 
   return (
     <>
       <Cell
+        height={height}
+        width={width}
         value={value}
         type={type}
         owner={owner}

@@ -4,76 +4,92 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
-import Typography from "@material-ui/core/Typography";
 
 import { getCellBackground, getTextColor } from "./cell.utils";
 
-export const useStyles = makeStyles(theme => ({
-  container: {
+export const useStyles = makeStyles((theme) => ({
+  container: ({ height }) => ({
     position: "relative",
     display: "flex",
     alignItems: "center",
-    width: "300px",
-    height: "150px",
+    height,
     cursor: "pointer",
     "&$containerOpened": {
-      cursor: "not-allowed"
-    }
-  },
+      cursor: "not-allowed",
+    },
+  }),
   containerBorder: {
-    border: "2px solid black"
+    border: "2px solid black",
   },
   containerOpened: {
-    opacity: 0.45
+    opacity: 0.45,
   },
   containerBackground: ({ background }) => ({
     background,
     backgroundSize: "contain",
     backgroundRepeat: "no-repeat",
-    backgroundPosition: "center"
+    backgroundPosition: "center",
   }),
   details: {
     display: "flex",
     flexDirection: "column",
-    width: "100%"
+    width: "100%",
+  },
+  contentRoot: {
+    padding: 0,
+    "&:last-child": {
+      padding: 0,
+    },
   },
   content: {
-    flex: "1 0 auto",
-    alignItems: "center",
-    justifyContent: "center",
     display: "flex",
-    flexDirection: "column"
+    alignItems: "center",
+    justifyContent: "space-around",
+    [theme.breakpoints.up("md")]: {
+      display: "block",
+    },
   },
   value: ({ textColor }) => ({
-    width: "100%",
     wordWrap: "break-word",
     textAlign: "center",
     hyphens: "manual",
-    color: textColor
-
+    color: textColor,
+    fontSize: "1.5rem",
+    fontWeight: 500,
+    [theme.breakpoints.up("lg")]: {
+      fontSize: "1.7rem",
+    },
   }),
   cover: {
     width: 151,
-    margin: theme.spacing(1)
+    margin: theme.spacing(1),
   },
   controls: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+    paddingBottom: theme.spacing(1),
   },
   icon: ({ textColor }) => ({
+    color: textColor,
     height: 38,
     width: 38,
-    color: textColor
-  })
+  }),
 }));
 
-export const Cell = ({ value, opened, owner, type, options = {} }) => {
+export const Cell = ({
+  height,
+  width,
+  value,
+  opened,
+  owner,
+  type,
+  options = {},
+}) => {
   const background = getCellBackground({ owner, type });
   const textColor = getTextColor({ owner, type });
-  const classes = useStyles({ background, textColor });
+  const classes = useStyles({ background, textColor, height, width });
 
   const { controls } = options;
 
@@ -88,22 +104,19 @@ export const Cell = ({ value, opened, owner, type, options = {} }) => {
       )}
     >
       <div className={classes.details}>
-        <CardContent className={classes.content}>
-          <Typography
-            component="h3"
-            variant="h3"
-            classes={{ root: classes.value }}
-          >
-            {value}
-          </Typography>
+        <CardContent
+          classes={{ root: classes.contentRoot }}
+          className={classes.content}
+        >
+          <div className={classes.value}>{value}</div>
+          {!opened && controls && (
+            <div className={classes.controls}>
+              {controls.map(({ renderControl }) =>
+                renderControl({ classes: { icon: classes.icon } })
+              )}
+            </div>
+          )}
         </CardContent>
-        {!opened && controls && (
-          <div className={classes.controls}>
-            {controls.map(({ renderControl }) =>
-              renderControl({ classes: { icon: classes.icon } })
-            )}
-          </div>
-        )}
       </div>
     </Card>
   );
